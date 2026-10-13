@@ -2,6 +2,19 @@
 
 Playwright + TypeScript tests for the Ritchie Bros. Auctioneers website (<https://www.rbauction.com>), covering the Locations directory, an Edmonton yard page, and inventory search at the UI, API, and server page-data levels.
 
+## Prerequisites
+
+- Node.js 20+
+- npm
+- **Google Chrome**
+
+**Google Chrome is required.** The Playwright configuration uses the installed
+ Chrome channel (`channel: 'chrome'`). If Chrome is not already installed, run:
+
+ ```bash
+ npx playwright install chrome
+ ```
+
 ## Quick start
 
 ```bash
@@ -10,7 +23,6 @@ npm run typecheck
 npm test
 ```
 
-Requires Node.js 20+ and Google Chrome. Chrome must be installed because the Playwright project uses `channel: 'chrome'` (`npx playwright install chrome` can install it).
 
 ## Coverage
 
