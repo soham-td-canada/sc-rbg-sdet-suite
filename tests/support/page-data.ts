@@ -9,7 +9,10 @@ export async function readPageProps(
 ): Promise<{ pageProps: Record<string, any>; query: any }> {
   await page.goto(path, { waitUntil: 'domcontentloaded' });
 
-  const text = await page.locator('script#__NEXT_DATA__').textContent();
+  const nextDataScript = page.locator('script#__NEXT_DATA__');
+  await expect(nextDataScript, '__NEXT_DATA__ script should exist exactly once').toHaveCount(1);
+
+  const text = await nextDataScript.textContent();
   expect(text?.trim(), '__NEXT_DATA__ script should not be empty').toBeTruthy();
 
   const nextData = JSON.parse(text as string);
