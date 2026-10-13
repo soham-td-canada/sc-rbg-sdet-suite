@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 
-// Parses displayed counts such as "3.8k results", "1,234 results", "123 results"
-// or "Upcoming (3,838)" into a number (3.8k -> 3800).
+// Parses displayed counts such as "1.2k results", "1,234 results", "123 results"
+// or "Upcoming (1,234)" into a number (1.2k -> 1200).
 function parseCount(text: string): number {
   const match = /(\d[\d,]*(?:\.\d+)?)([km])?\b/i.exec(text);
   if (!match?.[1]) {
@@ -29,7 +29,7 @@ test.describe('Edmonton search results', () => {
     const summary = page.getByTestId('search-count-header');
     await expect(summary).toContainText('Edmonton');
 
-    // The summary is abbreviated ("3.8k results"); the Upcoming button has the exact count.
+    // The summary is abbreviated ("1.2k results"); the Upcoming button has the exact count.
     // Both are dynamic, so only require them to be positive.
     const total = parseCount(await summary.innerText());
     const upcoming = parseCount(
@@ -56,7 +56,6 @@ test.describe('Edmonton search results', () => {
         };
       }),
     );
-    console.log(`[SEARCH] first titles=${JSON.stringify(lots.slice(0, 5).map((l) => l.title))}`);
 
     expect(lots.length).toBeGreaterThan(0);
     expect(lots.filter((lot) => lot.title === '')).toEqual([]);

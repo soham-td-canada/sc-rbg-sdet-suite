@@ -38,13 +38,7 @@ test('POST /api/search returns the Edmonton search contract', async ({ request }
   );
   expect(invalidRecordIndexes, 'records without a non-empty assetDescription').toEqual([]);
 
-  // The response echoes the request it served.
   expect(body.requests.freeText).toBe('Edmonton');
 
   console.log(`[API SEARCH] total=${total}`);
-  console.log(
-    `[API SEARCH] first titles=${JSON.stringify(
-      records.slice(0, 5).map((record: any) => record.assetDescription),
-    )}`,
-  );
 });

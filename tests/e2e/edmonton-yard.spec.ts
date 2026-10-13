@@ -119,7 +119,6 @@ test.describe('Edmonton yard page', () => {
     const panel = page.getByRole('tabpanel', { name: 'Representatives', exact: true });
     await expect(panel).toBeVisible();
 
-    // Each representative's name is an h4.
     const repNames = panel.getByRole('heading', { level: 4 });
     await expect.poll(() => repNames.count()).toBeGreaterThanOrEqual(1);
     expect((await repNames.allTextContents()).map((n) => n.trim())).not.toContain('');

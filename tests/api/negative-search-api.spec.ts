@@ -9,7 +9,7 @@ test.describe('POST /api/search negative contracts', () => {
     });
 
     const text = await response.text();
-    console.log(`[API-NEG] malformed JSON -> status=${response.status()} body=${JSON.stringify(text.slice(0, 80))}`);
+    console.log(`[API-NEG] malformed JSON -> status=${response.status()}`);
 
     expect(response.status()).toBe(400);
     expect(text).toContain('Invalid JSON');

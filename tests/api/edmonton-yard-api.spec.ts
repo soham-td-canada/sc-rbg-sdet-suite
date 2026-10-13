@@ -16,7 +16,6 @@ test.describe('API 2 - Edmonton yard page JSON', () => {
     const { pageProps, query } = await readPageProps(page, '/lp/edmonton-ab');
     expect(query?.slug).toBe('edmonton-ab');
 
-    // Yard identity
     const yardDetails: YardDetails = pageProps.yardDetails;
     expect(yardDetails, 'props.pageProps.yardDetails').toMatchObject({
       name: 'Edmonton',
