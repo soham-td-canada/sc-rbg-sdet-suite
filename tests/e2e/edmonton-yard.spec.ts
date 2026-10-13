@@ -87,13 +87,12 @@ test.describe('Edmonton yard page', () => {
     expect(quantities).toHaveLength(names.length);
     expect(quantities.filter((q) => !/^\d[\d,]* items?$/.test(q))).toEqual([]);
     expect(names).toContain('Excavators');
-    // Inventory is dynamic: require any one of several categories seen in production.
+    // Inventory is dynamic: require at least one of the categories named in the requirements.
     const otherExpected = [
-      'Truck Tractors',
-      'Skid Steer Attachments',
-      'Agricultural Tractors',
       'Harvesting Equipment',
-      'Tools',
+      'Agricultural Tractors',
+      'Sprayers',
+      'Excavator Attachments',
     ];
     expect(otherExpected.filter((category) => names.includes(category))).not.toEqual([]);
   });
@@ -123,12 +122,26 @@ test.describe('Edmonton yard page', () => {
     await expect.poll(() => repNames.count()).toBeGreaterThanOrEqual(1);
     expect((await repNames.allTextContents()).map((n) => n.trim())).not.toContain('');
 
-    // Territory is the h6 in the row led by a location icon. Not every rep has one,
-    // so only require that at least one rep lists a meaningful territory.
-    const territories = await panel.getByTestId('LocationOnIcon').locator('..').allTextContents();
-    expect(territories.filter((t) => /[A-Za-z]{3,}/.test(t))).not.toEqual([]);
-
-    await expect(panel.locator('a[href^="tel:"]')).not.toHaveCount(0);
-    await expect(panel.locator('a[href^="mailto:"]')).not.toHaveCount(0);
+    // A representative's card is the parent of their h4 name: it holds the territory row
+    // (the h6 led by a location icon) and the contact links. Not every rep has a territory,
+    // so require at least one card with a name, a territory and a phone or email link.
+    const representatives = await repNames.evaluateAll((headings) =>
+      headings.map((heading) => {
+        const card = heading.parentElement;
+        return {
+          name: heading.textContent?.trim() ?? '',
+          territory:
+            card?.querySelector('[data-testid="LocationOnIcon"]')?.parentElement?.textContent?.trim() ??
+            '',
+          hasContact: Boolean(card?.querySelector('a[href^="tel:"], a[href^="mailto:"]')),
+        };
+      }),
+    );
+    expect(
+      representatives.filter(
+        (rep) => rep.name !== '' && /[A-Za-z]{3,}/.test(rep.territory) && rep.hasContact,
+      ),
+      'representatives with a name, a territory and a phone/email contact',
+    ).not.toEqual([]);
   });
 });

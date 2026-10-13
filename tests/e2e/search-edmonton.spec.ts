@@ -56,6 +56,9 @@ test.describe('Edmonton search results', () => {
         };
       }),
     );
+    console.log(
+      `[SEARCH] first 5 titles=${JSON.stringify(lots.slice(0, 5).map((lot) => lot.title))}`,
+    );
 
     expect(lots.length).toBeGreaterThan(0);
     expect(lots.filter((lot) => lot.title === '')).toEqual([]);

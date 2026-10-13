@@ -41,4 +41,9 @@ test('POST /api/search returns the Edmonton search contract', async ({ request }
   expect(body.requests.freeText).toBe('Edmonton');
 
   console.log(`[API SEARCH] total=${total}`);
+  console.log(
+    `[API SEARCH] first 5 titles=${JSON.stringify(
+      records.slice(0, 5).map((record: any) => record.assetDescription),
+    )}`,
+  );
 });

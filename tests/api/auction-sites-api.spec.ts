@@ -14,7 +14,7 @@ test.describe('API 1 - Auction sites page JSON', () => {
     const { pageProps } = await readPageProps(page, '/lp');
     expect(Array.isArray(pageProps.yards), 'props.pageProps.yards should be an array').toBe(true);
     const yards: Yard[] = pageProps.yards;
-    expect(yards.length).toBeGreaterThan(0);
+    expect(yards.length).toBeGreaterThan(60);
 
     // Every record has a name, a known type, and a country. Other fields can be null.
     const problems = yards.flatMap((yard, index) => {
@@ -32,7 +32,7 @@ test.describe('API 1 - Auction sites page JSON', () => {
     expect(problems, 'invalid location records').toEqual([]);
 
     const countries = [...new Set(yards.map((yard) => yard.address.country as string))];
-    expect(countries.length).toBeGreaterThan(1);
+    expect(countries.length).toBeGreaterThan(8);
     expect(countries).toContain('Canada');
     expect(countries).toContain('United States');
 
@@ -49,8 +49,8 @@ test.describe('API 1 - Auction sites page JSON', () => {
 
     const permanent = yards.filter((yard) => yard.type === 'Permanent').length;
     const satellite = yards.filter((yard) => yard.type === 'Satellite').length;
-    expect(permanent).toBeGreaterThan(0);
-    expect(satellite).toBeGreaterThan(0);
+    expect(permanent).toBeGreaterThan(25);
+    expect(satellite).toBeGreaterThan(15);
 
     console.log(
       `[API1] locations=${yards.length} satellite=${satellite} permanent=${permanent} countries=${countries.length}`,
