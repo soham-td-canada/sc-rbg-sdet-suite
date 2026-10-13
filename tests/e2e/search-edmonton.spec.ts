@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { openSearch } from '../support/search-page';
 
 // Parses displayed counts such as "1.2k results", "1,234 results", "123 results"
 // or "Upcoming (1,234)" into a number (1.2k -> 1200).
@@ -15,10 +16,7 @@ type Lot = { title: string; location: string | null; closing: string | null };
 
 test.describe('Edmonton search results', () => {
   test.beforeEach(async ({ page }) => {
-    // Results are server-rendered, so DOMContentLoaded is enough; the Upcoming button
-    // signals that the results UI is ready.
-    await page.goto('/search?freeText=Edmonton', { waitUntil: 'domcontentloaded' });
-    await expect(page.getByRole('button', { name: /^Upcoming/ })).toBeVisible();
+    await openSearch(page, 'Edmonton');
   });
 
   test('shows the Edmonton search context and a positive result total', async ({ page }) => {

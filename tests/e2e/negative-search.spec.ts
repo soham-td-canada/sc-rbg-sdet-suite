@@ -1,11 +1,11 @@
 import { expect, test } from '@playwright/test';
+import { openSearch } from '../support/search-page';
 
 test('shows a no-exact-matches message with fallback results for an impossible query', async ({
   page,
 }) => {
   const query = 'zzzzqxjv9999';
-  await page.goto(`/search?freeText=${query}`, { waitUntil: 'domcontentloaded' });
-  await expect(page.getByRole('button', { name: /^Upcoming/ })).toBeVisible();
+  await openSearch(page, query);
 
   await expect(page.getByRole('textbox', { name: 'Search', exact: true })).toHaveValue(query);
 
