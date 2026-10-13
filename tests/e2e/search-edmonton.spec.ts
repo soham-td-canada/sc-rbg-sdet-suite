@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test';
 // Parses displayed counts such as "3.8k results", "1,234 results", "123 results"
 // or "Upcoming (3,838)" into a number (3.8k -> 3800).
 function parseCount(text: string): number {
-  const match = /(\d[\d,]*(?:\.\d+)?)\s*([km])?/i.exec(text);
+  const match = /(\d[\d,]*(?:\.\d+)?)([km])?\b/i.exec(text);
   if (!match?.[1]) {
     throw new Error(`No count found in "${text}"`);
   }
@@ -22,7 +22,9 @@ test.describe('Edmonton search results', () => {
   });
 
   test('shows the Edmonton search context and a positive result total', async ({ page }) => {
-    await expect(page.getByRole('textbox', { name: 'Search' })).toHaveValue('Edmonton');
+    await expect(page.getByRole('textbox', { name: 'Search', exact: true })).toHaveValue(
+      'Edmonton',
+    );
 
     const summary = page.getByTestId('search-count-header');
     await expect(summary).toContainText('Edmonton');
@@ -61,5 +63,8 @@ test.describe('Edmonton search results', () => {
     // Location and closing are optional, but must not be blank when shown.
     expect(lots.filter((lot) => lot.location === '')).toEqual([]);
     expect(lots.filter((lot) => lot.closing === '')).toEqual([]);
+    // ...but the selectors must still match at least some current cards.
+    expect(lots.some((lot) => Boolean(lot.location))).toBe(true);
+    expect(lots.some((lot) => Boolean(lot.closing))).toBe(true);
   });
 });
