@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { isNonEmptyString, readPageProps } from '../support/page-data';
 
 // /lp is server-rendered by Next.js (getServerSideProps); its locations are not served by a
 // separate public API, so this contract is read from the embedded page data instead.
@@ -10,21 +11,12 @@ type Yard = {
 
 test.describe('API 1 - Auction sites page JSON', () => {
   test('validates auction sites payload', async ({ page }) => {
-    await page.goto('/lp', { waitUntil: 'domcontentloaded' });
-
-    const raw = await page.locator('script#__NEXT_DATA__').textContent();
-    expect(raw?.trim(), '__NEXT_DATA__ script should not be empty').toBeTruthy();
-
-    const nextData = JSON.parse(raw as string);
-    expect(
-      Array.isArray(nextData?.props?.pageProps?.yards),
-      'props.pageProps.yards should be an array',
-    ).toBe(true);
-    const yards: Yard[] = nextData.props.pageProps.yards;
+    const { pageProps } = await readPageProps(page, '/lp');
+    expect(Array.isArray(pageProps.yards), 'props.pageProps.yards should be an array').toBe(true);
+    const yards: Yard[] = pageProps.yards;
     expect(yards.length).toBeGreaterThan(0);
 
     // Every record has a name, a known type, and a country. Other fields can be null.
-    const isNonEmptyString = (value: unknown) => typeof value === 'string' && value.trim() !== '';
     const problems = yards.flatMap((yard, index) => {
       const issues: string[] = [];
       if (!isNonEmptyString(yard?.name)) issues.push('name');

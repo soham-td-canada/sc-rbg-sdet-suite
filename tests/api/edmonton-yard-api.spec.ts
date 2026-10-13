@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { isNonEmptyString, readPageProps } from '../support/page-data';
 
 // /lp/[slug] is server-rendered by Next.js (getServerSideProps); the yard data is read from
 // the embedded page data rather than from a separate public API.
@@ -12,16 +13,11 @@ type ItemGroup = { categories: unknown };
 
 test.describe('API 2 - Edmonton yard page JSON', () => {
   test('validates Edmonton yard payload', async ({ page }) => {
-    await page.goto('/lp/edmonton-ab', { waitUntil: 'domcontentloaded' });
-
-    const raw = await page.locator('script#__NEXT_DATA__').textContent();
-    expect(raw?.trim(), '__NEXT_DATA__ script should not be empty').toBeTruthy();
-
-    const nextData = JSON.parse(raw as string);
-    expect(nextData?.query?.slug).toBe('edmonton-ab');
+    const { pageProps, query } = await readPageProps(page, '/lp/edmonton-ab');
+    expect(query?.slug).toBe('edmonton-ab');
 
     // Yard identity
-    const yardDetails: YardDetails = nextData.props?.pageProps?.yardDetails;
+    const yardDetails: YardDetails = pageProps.yardDetails;
     expect(yardDetails, 'props.pageProps.yardDetails').toMatchObject({
       name: 'Edmonton',
       address: {
@@ -33,14 +29,13 @@ test.describe('API 2 - Edmonton yard page JSON', () => {
     });
 
     // Upcoming events: dynamic, but at least one must exist.
-    const upcomingEvents = nextData.props?.pageProps?.upcomingEvents;
+    const upcomingEvents = pageProps.upcomingEvents;
     expect(Array.isArray(upcomingEvents), 'props.pageProps.upcomingEvents should be an array').toBe(
       true,
     );
     const events: UpcomingEvent[] = upcomingEvents;
     expect(events.length).toBeGreaterThan(0);
 
-    const isNonEmptyString = (value: unknown) => typeof value === 'string' && value.trim() !== '';
     const eventProblems = events.flatMap((event, index) => {
       const issues: string[] = [];
       if (!isNonEmptyString(event?.event_advertised_name)) issues.push('event_advertised_name');
@@ -57,7 +52,7 @@ test.describe('API 2 - Edmonton yard page JSON', () => {
     // Items in yard: an array of groups, each holding categories. The same category name can
     // appear in several groups (and groups need not map to upcomingEvents), so categories are
     // only de-duplicated after flattening.
-    const itemsInYard = nextData.props?.pageProps?.itemsInYard;
+    const itemsInYard = pageProps.itemsInYard;
     expect(Array.isArray(itemsInYard), 'props.pageProps.itemsInYard should be an array').toBe(true);
     const groups: ItemGroup[] = itemsInYard;
     expect(groups.length).toBeGreaterThan(0);
